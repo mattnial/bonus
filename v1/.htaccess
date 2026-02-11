@@ -1,0 +1,6 @@
+RewriteEngine On
+# Si el archivo existe (ej: una imagen o css), déjalo pasar
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+# Si no, mándalo todo al Cerebro (index.php)
+RewriteRule ^([a-zA-Z0-9-/]+)$ index.php?route=$1 [QSA,L]

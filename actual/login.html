@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión | Vilcanet Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .vilcanet-bg {
+            background: linear-gradient(135deg, #5c1a99 0%, #650a73 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Efecto de fondo sutil */
+        .vilcanet-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+
+<body class="vilcanet-bg h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative z-10">
+
+        <div class="p-8 text-center pb-2">
+            <div
+                class="w-16 h-16 bg-orange-500 rounded-xl flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4 shadow-lg shadow-orange-500/30">
+                V
+            </div>
+            <h1 class="text-2xl font-bold text-gray-800">Bienvenido a VILCANET</h1>
+            <p class="text-gray-500 text-sm mt-1">Sistema de Gestión Integral</p>
+        </div>
+
+        <form id="loginForm" class="p-8 pt-6">
+
+            <div id="errorMsg"
+                class="hidden bg-red-50 border border-red-200 text-red-600 text-sm p-3 rounded-lg mb-4 flex items-center gap-2">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="errorText">Credenciales incorrectas</span>
+            </div>
+
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Correo Corporativo</label>
+                    <div class="relative">
+                        <i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
+                        <input type="email" id="email" required
+                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                            placeholder="admin@vilcanet.com.ec">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                    <div class="relative">
+                        <i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
+                        <input type="password" id="password" required
+                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                            placeholder="••••••••">
+                    </div>
+                </div>
+
+                <button type="submit" id="btnSubmit"
+                    class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3.5 rounded-lg shadow-lg shadow-blue-700/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex justify-center items-center gap-2">
+                    <span>INGRESAR AL SISTEMA</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <div class="mt-6 text-center">
+                <a href="#" class="text-sm text-gray-400 hover:text-blue-600">¿Olvidaste tu contraseña?</a>
+            </div>
+        </form>
+
+        <div class="bg-gray-50 py-3 text-center border-t border-gray-100">
+            <p class="text-xs text-gray-400">&copy; 2024 Vilcanet ISP. Acceso restringido.</p>
+        </div>
+    </div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const btn = document.getElementById('btnSubmit');
+        const errorDiv = document.getElementById('errorMsg');
+        const errorText = document.getElementById('errorText');
+
+        // Efecto visual de carga
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+        btn.disabled = true;
+        btn.classList.add('opacity-75');
+        errorDiv.classList.add('hidden');
+
+        try {
+            const response = await fetch('api/auth/login.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                // credentials: 'include', // Opcional si solo usas localStorage, pero déjalo si usas PHP sessions
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            // AHORA SÍ COINCIDE CON EL PHP (data.success)
+            if (data.success) {
+                // 1. Guardar datos para que core.js los lea
+                localStorage.setItem('vilcanet_staff', JSON.stringify(data.user));
+                
+                // 2. Feedback visual
+                btn.innerHTML = '<i class="fas fa-check"></i> ¡Bienvenido!';
+                btn.classList.remove('bg-blue-700');
+                btn.classList.add('bg-green-600');
+                
+                // 3. Redirección a la ruta amigable
+                setTimeout(() => {
+                    // Usamos la ruta raíz o carpeta según tu configuración
+                    window.location.href = '/inicio'; 
+                }, 800);
+
+            } else {
+                throw new Error(data.message || 'Error de credenciales');
+            }
+
+        } catch (error) {
+            errorText.textContent = error.message || 'Error de conexión';
+            errorDiv.classList.remove('hidden');
+            
+            btn.innerHTML = '<span>INGRESAR AL SISTEMA</span><i class="fas fa-arrow-right"></i>';
+            btn.disabled = false;
+            btn.classList.remove('opacity-75');
+        }
+    });
+</script>
+
+</body>
+
+</html>

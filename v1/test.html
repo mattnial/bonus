@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST API SEMÁFORO | VILCANET</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #4a2c7a;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+        }
+
+        .test-controls {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e6e6fa;
+            border-radius: 6px;
+        }
+
+        .test-controls button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        #btn-login {
+            background-color: #4a2c7a;
+            color: white;
+        }
+
+        #btn-search {
+            background-color: #007bff;
+            color: white;
+        }
+
+        #results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        #results-table th,
+        #results-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        #results-table th {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .color-green {
+            background-color: #d4edda;
+            color: #155724;
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-weight: bold;
+        }
+
+        .color-yellow {
+            background-color: #fff3cd;
+            color: #856404;
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-weight: bold;
+        }
+
+        .color-blue {
+            background-color: #cce5ff;
+            color: #004085;
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-weight: bold;
+        }
+
+        .color-purple {
+            background-color: #e0daee;
+            color: #4a2c7a;
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-weight: bold;
+        }
+
+        .color-orange {
+            background-color: #ffe8cc;
+            color: #8b5700;
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-weight: bold;
+        }
+
+        .color-red {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>🛠️ Test de API de Búsqueda de Cliente (Semáforo)</h1>
+
+        <div class="test-controls">
+            <p>1. Simular la sesión de administrador para evitar "Acceso Denegado".</p>
+            <button id="btn-login"><i class="fas fa-user-lock"></i> Iniciar Sesión Dummy</button>
+            <p>2. Buscar el cliente de prueba.</p>
+            <input type="text" id="cedulaSearch" value="2100976469" style="padding: 8px; border: 1px solid #ccc; width: 200px;">
+            <button id="btn-search"><i class="fas fa-magnifying-glass"></i> Probar Cédula</button>
+        </div>
+
+        <h2>Resultado de la Búsqueda:</h2>
+        <table id="results-table">
+            <thead>
+                <tr>
+                    <th>Campo</th>
+                    <th>Valor</th>
+                </tr>
+            </thead>
+            <tbody id="results-body">
+                <tr>
+                    <td colspan="2">Inicie sesión dummy y presione 'Probar Cédula'.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.getElementById('btn-login').addEventListener('click', async function() {
+            try {
+                const res = await fetch('api/auth/login_dummy.php');
+                const text = await res.text();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sesión Iniciada',
+                    text: 'Se ha simulado el login del Super Admin. ¡Listo para probar!',
+                    timer: 2000
+                });
+            } catch (error) {
+                Swal.fire('Error', 'No se pudo conectar al script dummy.', 'error');
+            }
+        });
+
+        document.getElementById('btn-search').addEventListener('click', searchClient);
+
+        async function searchClient() {
+            const cedula = document.getElementById('cedulaSearch').value.trim();
+            const body = document.getElementById('results-body');
+            body.innerHTML = '<tr><td colspan="2"><i class="fas fa-spinner fa-spin"></i> Cargando...</td></tr>';
+            
+            try {
+                const response = await fetch(`api/admin/search_client.php?cedula=${cedula}`);
+                const json = await response.json();
+
+                if (json.status === 'ok') {
+                    displayResults(json.data);
+                } else if (json.status === 'not_found') {
+                    body.innerHTML = `<tr><td colspan="2" style="background: #f8d7da; color: #721c24;">Cliente no encontrado en la base de datos.</td></tr>`;
+                } else {
+                    body.innerHTML = `<tr><td colspan="2" style="background: #ffe8cc; color: #8b5700;">Error: ${json.msg}</td></tr>`;
+                }
+            } catch (error) {
+                body.innerHTML = `<tr><td colspan="2" style="background: #f8d7da; color: #721c24;">ERROR: Fallo de conexión o JSON inválido.</td></tr>`;
+            }
+        }
+
+        function displayResults(data) {
+            const body = document.getElementById('results-body');
+            body.innerHTML = '';
+
+            for (const key in data) {
+                let value = data[key];
+                let displayKey = key.replace(/_/g, ' ').toUpperCase();
+                
+                // Formateo especial para el semáforo
+                if (key === 'semaphore_color') {
+                    value = `<span class="color-${value}">${value.toUpperCase()}</span>`;
+                } else if (key === 'semaphore_text') {
+                    // Si ya formateamos el color, lo mostramos primero
+                    value = data['semaphore_color'] 
+                        ? `<span class="color-${data['semaphore_color']}">${value}</span>`
+                        : value;
+                    displayKey = 'ESTADO SEMÁFORO';
+                }
+
+                body.innerHTML += `
+                    <tr>
+                        <td style="font-weight: bold;">${displayKey}</td>
+                        <td>${value === null ? 'N/A' : value}</td>
+                    </tr>
+                `;
+            }
+        }
+    </script>
+</body>
+
+</html>

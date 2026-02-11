@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Vilcanet CRM</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+</head>
+
+<body class="bg-gray-100 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+
+        <aside class="w-64 bg-blue-900 text-white flex flex-col shadow-xl transition-all duration-300" id="sidebar">
+            <div class="h-16 flex items-center justify-center border-b border-blue-800">
+                <h2 class="text-2xl font-bold tracking-wider">VILCANET</h2>
+            </div>
+
+            <nav class="flex-1 px-2 py-4 space-y-2 overflow-y-auto">
+                <a href="#" onclick="switchView('home')"
+                    class="flex items-center px-4 py-3 bg-blue-800 rounded-lg hover:bg-blue-700 transition">
+                    <i class="fas fa-home w-6"></i> <span class="font-medium">Inicio</span>
+                </a>
+
+                <a href="#" onclick="switchView('tickets')"
+                    class="flex items-center px-4 py-2 hover:bg-blue-800 rounded-lg transition">
+                    <i class="fas fa-ticket-alt w-6"></i> <span>Tickets Globales</span>
+                </a>
+
+                <a href="#" id="nav-rrhh" onclick="switchView('rrhh')" class="flex items-center px-4 py-2 hover:bg-blue-800 rounded-lg transition">
+                    <i class="fas fa-users-cog w-6"></i> <span>Talento Humano</span>
+                </a>
+                <a href="#" id="nav-cobros" onclick="switchView('billing')"
+                    class="flex items-center px-4 py-2 hover:bg-blue-800 rounded-lg transition">
+                    <i class="fas fa-hand-holding-usd w-6"></i> <span>Cobranzas</span>
+                </a>
+                <a href="#" id="nav-reports" onclick="switchView('reports')"
+                    class="flex items-center px-4 py-2 hover:bg-blue-800 rounded-lg transition">
+                    <i class="fas fa-file-download w-6"></i> <span>Reportes</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-blue-800">
+                <button onclick="logout()" class="flex items-center text-gray-300 hover:text-white w-full transition-colors">
+                    <i class="fas fa-sign-out-alt w-6"></i> <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col h-screen overflow-hidden">
+
+            <header class="h-16 bg-white shadow flex items-center justify-between px-6 z-10">
+                <div class="flex items-center">
+                    <button class="text-gray-500 focus:outline-none lg:hidden mr-4">
+                        <i class="fas fa-bars fa-lg"></i>
+                    </button>
+                    <h1 class="text-xl font-bold text-gray-800" id="pageTitle">Panel General</h1>
+                </div>
+            
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button onclick="toggleNotifications()" class="relative p-2 ...">
+                            <i class="fas fa-bell fa-lg"></i>
+                            
+                            <span id="notifBadge" class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white hidden flex items-center justify-center min-w-[20px]">
+                                0
+                            </span>
+                        </button>
+                    
+                        <div id="notifDropdown"
+                            class="hidden absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 overflow-hidden transform transition-all origin-top-right">
+                            <div class="bg-gray-50 px-4 py-2 border-b border-gray-100">
+                                <h3 class="text-xs font-bold text-gray-500 uppercase">Notificaciones</h3>
+                            </div>
+                            <div id="notifList" class="max-h-64 overflow-y-auto">
+                                <p class="text-center text-gray-400 text-xs py-4">Sin novedades</p>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div onclick="openProfileModal()"
+                        class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition select-none">
+            
+                        <div class="text-right hidden md:block">
+                            <p class="text-sm font-bold text-gray-700" id="userName">Cargando...</p>
+                            <p class="text-xs text-gray-500" id="userRole">...</p>
+                        </div>
+            
+                        <div
+                            class="h-10 w-10 rounded-full bg-blue-200 flex items-center justify-center text-blue-700 font-bold text-xl overflow-hidden border-2 border-blue-100 relative">
+                            <span id="userAvatarInitial">...</span>
+                            <img id="userAvatarImg" src="" class="h-full w-full object-cover absolute inset-0 hidden">
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+
+                <div id="view-home" class="space-y-6 fade-in">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div
+                            class="bg-white rounded-lg shadow p-5 border-l-4 border-green-500 flex justify-between items-center">
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase">Clientes Activos</p>
+                                <p class="text-2xl font-bold text-gray-800" id="kpiClients">...</p>
+                            </div>
+                            <div class="bg-green-100 p-3 rounded-full text-green-600"><i class="fas fa-wifi"></i></div>
+                        </div>
+                        <div
+                            class="bg-white rounded-lg shadow p-5 border-l-4 border-yellow-500 flex justify-between items-center">
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase">Tickets Abiertos</p>
+                                <p class="text-2xl font-bold text-gray-800" id="kpiTickets">...</p>
+                            </div>
+                            <div class="bg-yellow-100 p-3 rounded-full text-yellow-600">
+                                <i class="fas fa-ticket-alt"></i></div>
+                        </div>
+                        <div
+                            class="bg-white rounded-lg shadow p-5 border-l-4 border-red-500 flex justify-between items-center">
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase">Urgentes</p>
+                                <p class="text-2xl font-bold text-red-600" id="kpiUrgent">...</p>
+                            </div>
+                            <div class="bg-red-100 p-3 rounded-full text-red-600">
+                                <i class="fas fa-exclamation-triangle"></i></div>
+                        </div>
+                        <div
+                            class="bg-white rounded-lg shadow p-5 border-l-4 border-purple-500 flex justify-between items-center">
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase">En Mora</p>
+                                <p class="text-2xl font-bold text-gray-800" id="kpiDebt">...</p>
+                            </div>
+                            <div class="bg-purple-100 p-3 rounded-full text-purple-600">
+                                <i class="fas fa-hand-holding-usd"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-lg">
+                        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-gray-800">Monitoreo en Vivo</h3>
+                            <button onclick="openNewClientModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition ml-auto">
+                                                                <i class="fas fa-user-plus"></i> Nuevo Cliente
+                                                            </button>
+                            <input type="text" id="clientSearchInput" placeholder="Buscar cliente por nombre o cédula..."
+                                class="border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 shadow-sm">
+                        </div>
+                    
+                        <div class="p-6">
+                            <p class="text-gray-500 text-xs mb-4 uppercase font-bold tracking-wider">Clientes recientes
+                            </p>
+
+                            <div id="clientsGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                <p class="text-gray-400 col-span-full text-center py-4">Cargando clientes...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-tickets" class="hidden space-y-6 fade-in">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <h2 class="text-2xl font-bold text-gray-800">Bandeja de Soporte</h2>
+                        <div class="flex gap-2">
+                            <select id="filterStatus" onchange="loadGlobalTickets()" class="border rounded-lg px-3 py-2 text-sm">
+                                <option value="">Todos (Abiertos)</option>
+                                <option value="ABIERTO">Solo Abiertos</option>
+                                <option value="EN_PROCESO">En Proceso</option>
+                                <option value="URGENTE">Urgentes</option>
+                                <option value="CERRADO">Cerrados / Historial</option>
+                            </select>
+                            <button onclick="loadGlobalTickets()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                                <i class="fas fa-sync-alt"></i> Actualizar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-blue-900 text-white uppercase text-xs">
+                                    <tr>
+                                        <th class="px-6 py-3">ID / Fecha</th>
+                                        <th class="px-6 py-3">Asunto</th>
+                                        <th class="px-6 py-3">Cliente</th>
+                                        <th class="px-6 py-3">Departamento</th>
+                                        <th class="px-6 py-3 text-center">Prioridad</th>
+                                        <th class="px-6 py-3 text-center">Estado</th>
+                                        <th class="px-6 py-3 text-center">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="globalTicketsTable" class="divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="7" class="text-center py-8 text-gray-400">Cargando...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div id="view-rrhh" class="hidden space-y-6 fade-in">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-bold text-gray-800">Gestión de Personal</h2>
+                        <button onclick="loadRRHH()" class="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-200"><i class="fas fa-sync"></i> Actualizar</button>
+                    </div>
+                
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="rrhhGrid">
+                        <p class="text-gray-400 col-span-full text-center">Cargando personal...</p>
+                    </div>
+                </div>
+                <div id="view-billing" class="hidden space-y-6 fade-in">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-bold text-gray-800">Cartera Vencida</h2>
+                        <button onclick="loadDebtors()" class="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-200">
+                            <i class="fas fa-sync"></i> Refrescar
+                        </button>
+                    </div>
+                
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-red-800 text-white uppercase text-xs">
+                                <tr>
+                                    <th class="px-6 py-3">Cliente</th>
+                                    <th class="px-6 py-3 text-center">Meses Mora</th>
+                                    <th class="px-6 py-3 text-center">Total Deuda</th>
+                                    <th class="px-6 py-3 text-center">Estado Actual</th>
+                                    <th class="px-6 py-3 text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="debtorsTable" class="divide-y divide-gray-200">
+                                <tr>
+                                    <td colspan="5" class="text-center py-8 text-gray-400">Cargando...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="view-reports" class="hidden space-y-6 fade-in">
+                    <h2 class="text-2xl font-bold text-gray-800">Centro de Reportes</h2>
+                    <p class="text-gray-500 text-sm">Descarga la información del sistema en formato Excel (CSV).</p>
+                
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                
+                        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition">
+                            <div class="h-12 w-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-xl mb-4">
+                                <i class="fas fa-ticket-alt"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800">Gestión de Tickets</h3>
+                            <p class="text-xs text-gray-400 mt-2 mb-4">Historial completo de soporte, tiempos y estados.</p>
+                            <button id="btn-rep-tickets" onclick="printReport('tickets')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded text-sm flex items-center justify-center gap-2">
+                                <i class="fas fa-print"></i> Imprimir PDF
+                            </button>
+                        </div>
+                
+                        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition">
+                            <div
+                                class="h-12 w-12 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center text-xl mb-4">
+                                <i class="fas fa-hand-holding-usd"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800">Cartera Vencida</h3>
+                            <p class="text-xs text-gray-400 mt-2 mb-4">Listado de clientes con deudas activas y montos.</p>
+                            <button id="btn-rep-debtors" onclick="printReport('debtors')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded text-sm flex items-center justify-center gap-2">
+                                <i class="fas fa-print"></i> Imprimir PDF
+                            </button>
+                        </div>
+                
+                        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition">
+                            <div class="h-12 w-12 bg-red-100 text-red-600 rounded-lg flex items-center justify-center text-xl mb-4">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800">Sanciones RRHH</h3>
+                            <p class="text-xs text-gray-400 mt-2 mb-4">Registro de multas y memos del personal.</p>
+                            <button id="btn-rep-rrhh" onclick="printReport('rrhh')" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded text-sm flex items-center justify-center gap-2">
+                                <i class="fas fa-print"></i> Imprimir PDF
+                            </button>
+                        </div>
+                
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+
+    <div id="clientModal"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity duration-300">
+        <div
+            class="bg-white w-full max-w-5xl h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col transform transition-all scale-100">
+            <div class="bg-blue-900 text-white px-6 py-4 flex justify-between items-center shadow-md shrink-0">
+                <div class="flex items-center gap-4">
+                    <div id="modalAvatar"
+                        class="w-10 h-10 bg-white text-blue-900 rounded-full flex items-center justify-center font-bold text-lg">
+                        - </div>
+                    <div>
+                        <h2 class="text-lg font-bold leading-tight" id="modalClientName">Cargando...</h2>
+                        <p class="text-xs text-blue-200" id="modalClientCedula">...</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="modalStatusBadge" class="bg-gray-600 px-3 py-1 rounded-full text-xs font-bold uppercase">...</span>
+                    <button onclick="closeClientModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-800 hover:bg-red-500 text-white transition"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto bg-gray-50 p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+                    <div class="space-y-6">
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 border-b pb-2">
+                                Contacto</h3>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500"><i class="fas fa-envelope w-5 text-center"></i> Email</span><span class="font-medium text-gray-800 truncate max-w-[150px]" id="modalEmail">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500"><i class="fas fa-phone w-5 text-center"></i> Teléfono</span><span class="font-medium text-gray-800" id="modalPhone">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500"><i class="fas fa-map-marker-alt w-5 text-center"></i> Dirección</span><span class="font-medium text-gray-800 truncate max-w-[150px]" id="modalAddress">-</span>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 mt-5">
+                                <a href="#" id="btnWsp" target="_blank"
+                                    class="bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg text-xs font-bold text-center flex items-center justify-center gap-1">
+                                    <i class="fab fa-whatsapp"></i> WhatsApp
+                                </a>
+                            
+                                <button onclick="openAgreementModal()" id="btn-convenio" class="bg-purple-100 hover:bg-purple-200 text-purple-700 border border-purple-200 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1">
+                                    <i class="fas fa-handshake"></i> Convenio
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 border-b pb-2">
+                                Finanzas</h3>
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-gray-600 text-sm">Puntos Bonus</span><span class="text-xl font-bold text-yellow-500" id="modalPoints">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 text-sm">Deuda Actual</span><span class="text-sm font-bold px-2 py-1 rounded bg-green-100 text-green-700" id="modalDebt">Al día</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2 flex flex-col h-full space-y-4">
+                        <div
+                            class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
+                            <div>
+                                <h3 class="font-bold text-gray-800">Historial de Tickets</h3>
+                                <p class="text-xs text-gray-400">Últimos incidentes registrados</p>
+                            </div>
+                            <button onclick="openTicketModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg shadow-blue-200 transition transform active:scale-95 flex items-center gap-2"><i class="fas fa-plus-circle"></i> Nuevo Ticket</button>
+                        </div>
+                        <div
+                            class="bg-white rounded-xl shadow-sm border border-gray-100 flex-1 overflow-hidden flex flex-col">
+                            <div class="overflow-y-auto p-2 space-y-2 h-64 lg:h-auto" id="modalTicketsList">
+                                <div class="text-center py-10 text-gray-400">
+                                    <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                                    <p>Cargando información...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ticketModal"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden transform transition-all">
+            <div class="bg-blue-800 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-white font-bold text-lg">Nuevo Ticket</h3>
+                <button onclick="closeTicketModal()" class="text-blue-200 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+
+            <form id="createTicketForm" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Asunto / Motivo</label>
+                    <input type="text" id="tSubject" class="w-full border-gray-300 border rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="Ej: Sin internet desde ayer" required>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Servicio Afectado</label>
+                        <select id="tService" class="w-full border-gray-300 border rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white">
+                            <option value="INTERNET">Internet</option>
+                            <option value="TV">Televisión</option>
+                            <option value="AMBOS">Ambos Servicios</option>
+                            <option value="OTRO">Otro / Administrativo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Departamento</label>
+                        <select id="tDept" class="w-full border-gray-300 border rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white">
+                            <option value="TECNICA">Soporte Técnico</option>
+                            <option value="VENTAS">Ventas / Info</option>
+                            <option value="COBROS">Cobranzas</option>
+                            <option value="FACTURACION">Facturación</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Prioridad</label>
+                        <select id="tPriority" class="w-full border-gray-300 border rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white">
+                            <option value="MEDIA">Normal</option>
+                            <option value="ALTA">Alta</option>
+                            <option value="URGENTE">⚠️ URGENTE</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Descripción Detallada</label>
+                    <textarea id="tDesc" rows="4" class="w-full border-gray-300 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="Detalle el problema..."></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-lg shadow-lg transition transform active:scale-95 flex justify-center items-center gap-2">
+                    <i class="fas fa-save"></i> GUARDAR TICKET
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="ticketDetailModal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-[70] flex items-center justify-center p-2 lg:p-4">
+        <div class="bg-white w-full max-w-4xl h-[85vh] rounded-xl shadow-2xl overflow-hidden flex flex-col">
+
+            <div class="bg-gray-800 text-white px-6 py-3 flex justify-between items-center shrink-0">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <span id="chatTicketId" class="bg-gray-600 px-2 py-0.5 rounded text-xs font-mono">#000</span>
+                        <h3 id="chatSubject" class="font-bold text-lg truncate max-w-md">Cargando...</h3>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1"><span id="chatDept">...</span> • Asignado a:
+                        <span id="chatStaff">Nadie</span></p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <select id="chatStatusSelect" onchange="changeTicketStatus(this.value)" class="bg-gray-700 text-white text-xs border border-gray-600 rounded px-2 py-1 outline-none cursor-pointer hover:bg-gray-600">
+                        <option value="ABIERTO">🟢 ABIERTO</option>
+                        <option value="EN_PROCESO">🟡 EN PROCESO</option>
+                        <option value="PENDIENTE_CLIENTE">🔵 ESPERANDO CLIENTE</option>
+                        <option value="RESUELTO">✅ RESUELTO</option>
+                        <option value="CERRADO">⚫ CERRADO</option>
+                    </select>
+                    <button onclick="closeChatModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-700 transition"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+
+            <div class="flex-1 flex overflow-hidden">
+                <div class="flex-1 flex flex-col bg-gray-100 relative">
+                    <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
+                    <div class="bg-white p-3 border-t flex gap-2 items-end">
+                        <div class="flex-1 relative">
+                            <textarea id="replyInput" rows="2" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none pr-10" placeholder="Escribe una respuesta..."></textarea>
+                            <button class="absolute bottom-2 right-2 text-gray-400 hover:text-blue-500"><i class="fas fa-paperclip"></i></button>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <button onclick="sendReply(false)" class="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-lg shadow transition" title="Enviar al Cliente"><i class="fas fa-paper-plane"></i></button>
+                            <button onclick="sendReply(true)" class="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-lg shadow transition text-xs font-bold" title="Nota Interna"><i class="fas fa-lock"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-64 bg-white border-l p-4 hidden lg:block overflow-y-auto">
+                    <h4 class="text-xs font-bold text-gray-400 uppercase mb-3">Descripción Original</h4>
+                    <div class="bg-blue-50 p-3 rounded-lg text-sm text-gray-700 mb-4 border border-blue-100">
+                        <p id="chatDescription">...</p>
+                    </div>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase mb-3">Acciones</h4>
+                    <div class="space-y-2">
+                        <button onclick="openAssignModal()" id="btn-asignar" class="w-full text-left px-3 py-2 rounded hover:bg-gray-50 text-sm text-gray-600 flex items-center gap-2">
+                            <i class="fas fa-user-plus text-blue-500"></i> Asignar Técnico
+                        </button>
+                        <input type="file" id="evidenceInput" class="hidden" accept="image/*,.pdf" onchange="uploadEvidence(this)">
+                        
+                        <button id="btnUploadEvidence" onclick="document.getElementById('evidenceInput').click()" class="w-full text-left px-3 py-2 rounded hover:bg-gray-50 text-sm text-gray-600 flex items-center gap-2">
+                            <i class="fas fa-file-upload text-blue-500"></i> Subir Evidencia
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="assignModal"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[80] flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl w-80 p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Asignar Responsable</h3>
+    
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Seleccionar Personal</label>
+            <select id="staffSelect" class="w-full border rounded px-3 py-2 mb-4 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                <option value="">Cargando...</option>
+            </select>
+    
+            <div class="flex justify-end gap-2">
+                <button onclick="document.getElementById('assignModal').classList.add('hidden')" class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded">Cancelar</button>
+                <button onclick="confirmAssignment()" class="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 font-bold">Guardar</button>
+            </div>
+        </div>
+    </div>
+    <div id="agreementModal"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[90] flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div class="bg-purple-700 text-white px-6 py-4 flex justify-between items-center">
+                <h3 class="font-bold text-lg"><i class="fas fa-handshake"></i> Nuevo Convenio</h3>
+                <button onclick="document.getElementById('agreementModal').classList.add('hidden')" class="hover:text-purple-200"><i class="fas fa-times"></i></button>
+            </div>
+    
+            <div class="p-6 space-y-4">
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 text-sm text-yellow-700">
+                    <i class="fas fa-exclamation-triangle"></i> Advertencia: Al guardar, el servicio del cliente se
+                    <b>reactivará inmediatamente</b> hasta la fecha seleccionada.
+                </div>
+    
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Fecha Límite de Pago</label>
+                    <input type="date" id="agDate" class="w-full border rounded-lg px-3 py-2 outline-none focus:border-purple-500 font-bold text-gray-700">
+                </div>
+    
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Notas / Observación</label>
+                    <textarea id="agNotes" rows="2" class="w-full border rounded-lg px-3 py-2 outline-none focus:border-purple-500 text-sm" placeholder="Ej: Cliente depositará el viernes..."></textarea>
+                </div>
+    
+                <button onclick="createAgreement()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg shadow-lg transition">
+                    CONFIRMAR Y REACTIVAR
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="rrhhModal"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[95] flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-gray-800 text-white px-6 py-4 flex justify-between items-center shrink-0">
+                <h3 class="font-bold text-lg"><i class="fas fa-id-card"></i> Hoja de Vida: <span id="rrhhName">...</span>
+                </h3>
+                <button onclick="document.getElementById('rrhhModal').classList.add('hidden')" class="hover:text-gray-300"><i class="fas fa-times"></i></button>
+            </div>
+    
+            <div class="flex-1 overflow-y-auto p-6">
+                <div class="bg-red-50 border border-red-100 rounded-xl p-4 mb-6">
+                    <h4 class="text-red-700 font-bold text-sm uppercase mb-3"><i class="fas fa-gavel"></i> Aplicar Sanción /
+                        Memo</h4>
+                    <form id="sanctionForm" class="space-y-3">
+                        <div class="grid grid-cols-2 gap-4">
+                            <select id="sancType" class="border rounded px-3 py-2 text-sm bg-white" onchange="toggleAmount(this.value)">
+                                <option value="" disabled selected>-- Seleccione Tipo --</option> <option value="LLAMADO_ATENCION">Llamado de Atención</option>
+                                <option value="MEMO">Memorando Escrito</option>
+                                <option value="MULTA">Multa Económica</option>
+                                <option value="DESPIDO">Despido</option>
+                            </select>
+                            <input type="number" id="sancAmount" placeholder="Monto ($)" class="border rounded px-3 py-2 text-sm hidden" step="0.01">
+                        </div>
+                        <textarea id="sancReason" rows="2" class="w-full border rounded px-3 py-2 text-sm" placeholder="Motivo de la sanción..." required></textarea>
+    
+                        <div class="flex items-center gap-2">
+                            <input type="file" id="sancFile" class="text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-red-100 file:text-red-700" accept=".pdf,image/*">
+                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm font-bold ml-auto">REGISTRAR</button>
+                        </div>
+                    </form>
+                </div>
+    
+                <h4 class="font-bold text-gray-700 mb-3">Historial de Sanciones</h4>
+                <div id="sanctionsList" class="space-y-2">
+                    <p class="text-gray-400 text-sm text-center">Sin sanciones registradas.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="toast-container" class="fixed top-5 right-5 z-[100] flex flex-col gap-3 pointer-events-none">
+    </div>
+    
+    <div id="confirmModal"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[110] flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-100 transition-all">
+            <div class="p-6 text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
+                    <i class="fas fa-question text-blue-600 text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">¿Estás seguro?</h3>
+                <p class="text-sm text-gray-500 mb-6" id="confirmMsg">Esta acción no se puede deshacer.</p>
+    
+                <div class="flex justify-center gap-3">
+                    <button id="btnConfirmNo" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-bold rounded-lg hover:bg-gray-300 transition">
+                        Cancelar
+                    </button>
+                    <button id="btnConfirmYes" class="px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 transition shadow-lg">
+                        Confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="profileModal"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div class="bg-gray-900 text-white px-6 py-4 flex justify-between items-center">
+                <h3 class="font-bold text-lg"><i class="fas fa-user-cog"></i> Mi Cuenta</h3>
+                <button onclick="document.getElementById('profileModal').classList.add('hidden')" class="hover:text-gray-400"><i class="fas fa-times"></i></button>
+            </div>
+    
+            <form id="profileForm" class="p-6 space-y-4">
+                <div class="flex justify-center mb-4">
+                    <div class="relative">
+                        <div class="w-24 h-24 rounded-full bg-gray-200 overflow-hidden border-4 border-white shadow-lg">
+                            <img id="previewAvatar" src="assets/img/default.png" class="w-full h-full object-cover">
+                        </div>
+                        <label class="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 shadow">
+                            <i class="fas fa-camera text-xs"></i>
+                            <input type="file" id="profileAvatar" class="hidden" accept="image/*" onchange="previewImage(this)">
+                        </label>
+                    </div>
+                </div>
+    
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre Completo</label>
+                    <input type="text" id="profileName" class="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+    
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Email</label>
+                    <input type="email" id="profileEmail" class="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50" readonly>
+                </div>
+    
+                <div class="border-t pt-4 mt-2">
+                    <p class="text-xs text-gray-400 mb-2">Dejar en blanco si no desea cambiar la clave</p>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nueva Contraseña</label>
+                    <input type="password" id="profilePass" class="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500" placeholder="********">
+                </div>
+    
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg transition">
+                    GUARDAR CAMBIOS
+                </button>
+            </form>
+        </div>
+    </div>
+    <div id="clientFormModal"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[80] flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden">
+            <div class="bg-green-700 text-white px-6 py-4 flex justify-between items-center">
+                <h3 class="font-bold text-lg" id="clientFormTitle">Nuevo Cliente</h3>
+                <button onclick="document.getElementById('clientFormModal').classList.add('hidden')" class="hover:text-green-200"><i class="fas fa-times"></i></button>
+            </div>
+    
+            <form id="saveClientForm" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="hidden" id="cliId">
+                <div class="md:col-span-2">
+                    <label class="text-xs font-bold text-gray-500">Nombre Completo</label>
+                    <input type="text" id="cliName" class="w-full border rounded p-2 text-sm uppercase" required>
+                </div>
+    
+                <div>
+                    <label class="text-xs font-bold text-gray-500">Cédula / RUC</label>
+                    <input type="text" id="cliCedula" class="w-full border rounded p-2 text-sm" required>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500">Celular</label>
+                    <input type="text" id="cliPhone" class="w-full border rounded p-2 text-sm">
+                </div>
+    
+                <div>
+                    <label class="text-xs font-bold text-gray-500">Email</label>
+                    <input type="email" id="cliEmail" class="w-full border rounded p-2 text-sm">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500">Plan Contratado</label>
+                    <input type="text" id="cliPlan" class="w-full border rounded p-2 text-sm" placeholder="Ej: 50MB Fibra">
+                </div>
+    
+                <div class="md:col-span-2">
+                    <label class="text-xs font-bold text-gray-500">Dirección Domiciliaria</label>
+                    <input type="text" id="cliAddress" class="w-full border rounded p-2 text-sm">
+                </div>
+    
+                <div class="md:col-span-2 border p-3 rounded bg-gray-50">
+                    <label class="text-xs font-bold text-gray-500 block mb-2">Servicios Activos</label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="checkInternet" class="w-4 h-4 text-blue-600 rounded" checked>
+                            <span class="text-sm font-bold">Internet</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="checkTV" class="w-4 h-4 text-purple-600 rounded">
+                            <span class="text-sm font-bold">Televisión</span>
+                        </label>
+                    </div>
+                </div>
+    
+                <div class="md:col-span-2">
+                    <label class="text-xs font-bold text-gray-500">Ubicación GPS (Link WhatsApp o Lat,Lon)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="cliCoords" class="w-full border rounded p-2 text-sm" placeholder="Ej: -4.001, -79.202">
+                        <button type="button" onclick="cleanCoords()" class="bg-gray-200 px-3 rounded text-xs" title="Extraer de Link"><i class="fas fa-magic"></i></button>
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-1">Pega el link de Google Maps y pulsa la varita mágica.</p>
+                </div>
+    
+                <div class="md:col-span-2 pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('clientFormModal').classList.add('hidden')" class="px-4 py-2 text-gray-600 font-bold bg-gray-100 rounded">Cancelar</button>
+                    <button type="submit" class="px-6 py-2 bg-green-600 text-white font-bold rounded shadow hover:bg-green-700">GUARDAR CLIENTE</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

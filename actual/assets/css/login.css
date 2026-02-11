@@ -1,0 +1,17 @@
+body {
+    background-color: #f3f4f6;
+    margin: 0;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.login-bg {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hidden {
+    display: none !important;
+}
